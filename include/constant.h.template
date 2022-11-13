@@ -1,0 +1,3 @@
+#define WIFI_SSID "your wifi ssid"
+#define WIFI_PASS "your wifi password"
+#define REQUEST_URI "https://maker.ifttt.com/trigger/{event}/json/with/key/****"
