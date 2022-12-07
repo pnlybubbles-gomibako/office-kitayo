@@ -30,6 +30,19 @@ void wifiSetup() {
   M5.dis.drawpix(0, white);
 }
 
+const String BODY_TEMPLATE = "{\"content\":\"オフィスにだれかきたよ\",\"embeds\":[{\"color\":5814783,\"fields\":[{\"name\":\"★ 今日の運勢 ★\",\"value\":\"<value>\"}]}]}";
+
+const String KUJI[] = {
+  "大吉",
+  "中吉",
+  "小吉",
+  "吉",
+  "末吉",
+  "凶",
+  "大凶"
+};
+const int SIZE_OF_KUJI = sizeof(KUJI) / sizeof(KUJI[0]);
+
 void send(String url) {
   if (WiFi.status() != WL_CONNECTED) {
     wifiSetup();
@@ -37,15 +50,18 @@ void send(String url) {
 
   Serial.print("http requesting...");
 
+  String body = String(BODY_TEMPLATE);
+  body.replace("<value>", KUJI[int(random(0, SIZE_OF_KUJI))]);
+
   HTTPClient http;
   http.begin(url);
   http.setReuse(false);
   http.setConnectTimeout(http_timeout);
   http.setTimeout(http_timeout);
-  int status_code = http.POST("");
+  http.addHeader("Content-Type", "application/json");
+  int status_code = http.POST(body);
   Serial.printf("status_code=%d\r\n", status_code);
-  Serial.println(HTTPClient::errorToString(status_code));
-  if (status_code != 200) {
+  if (status_code != 200 && status_code != 204) {
     Serial.println("failed");
     M5.dis.drawpix(0, red);
   } else {
